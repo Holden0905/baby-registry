@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSiteById } from "@/lib/data/sites";
 import { getTaskTemplatesForSite } from "@/lib/data/task-templates";
+import { getUniqueRegulationNames } from "@/lib/data/requirements";
 import { AddEquipmentForm } from "./AddEquipmentForm";
 
 export const dynamic = "force-dynamic";
@@ -10,9 +11,10 @@ type PageProps = { params: Promise<{ siteId: string }> };
 
 export default async function AddEquipmentPage({ params }: PageProps) {
   const { siteId } = await params;
-  const [site, taskTemplates] = await Promise.all([
+  const [site, taskTemplates, regulations] = await Promise.all([
     getSiteById(siteId),
     getTaskTemplatesForSite(siteId),
+    getUniqueRegulationNames(),
   ]);
 
   if (!site) notFound();
@@ -34,7 +36,7 @@ export default async function AddEquipmentPage({ params }: PageProps) {
       </p>
 
       <div className="mt-8 max-w-md">
-        <AddEquipmentForm siteId={siteId} taskTemplates={taskTemplates} />
+        <AddEquipmentForm siteId={siteId} taskTemplates={taskTemplates} regulations={regulations} />
       </div>
     </div>
   );

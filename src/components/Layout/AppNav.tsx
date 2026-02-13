@@ -34,10 +34,22 @@ export function AppNav() {
             Equipment
           </Link>
           <Link
+            href="/requirements"
+            className="text-sm font-medium text-slate-200 hover:text-white transition-colors"
+          >
+            Requirements
+          </Link>
+          <Link
             href="/tasks"
             className="text-sm font-medium text-slate-200 hover:text-white transition-colors"
           >
             Tasks
+          </Link>
+          <Link
+            href="/task-templates"
+            className="text-sm font-medium text-slate-200 hover:text-white transition-colors"
+          >
+            Task Templates
           </Link>
           <Link
             href="/users"

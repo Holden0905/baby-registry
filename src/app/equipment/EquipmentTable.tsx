@@ -9,18 +9,17 @@ type EquipmentRow = {
   equipment_description: string;
   equipment_type: string | null;
   process_unit: string | null;
+  regulation_name: string | null;
   requirements: string[];
   equipment_site_id: string;
 };
-
-type Site = { id: string; name: string };
 
 export function EquipmentTable({
   equipment,
   sites,
 }: {
   equipment: EquipmentRow[];
-  sites: Site[];
+  sites: { id: string; name: string }[];
 }) {
   return (
     <SortableDataTable<EquipmentRow>
@@ -57,8 +56,16 @@ export function EquipmentTable({
           cellClassName: "whitespace-nowrap",
         },
         {
+          id: "regulation_name",
+          label: "Regulation",
+          accessor: (r) => r.regulation_name,
+          sortable: true,
+          filterable: true,
+          cellClassName: "whitespace-nowrap",
+        },
+        {
           id: "requirements",
-          label: "Requirements",
+          label: "Citations",
           accessor: (r) =>
             r.requirements?.length ? r.requirements.join(", ") : null,
           sortable: true,
@@ -66,16 +73,6 @@ export function EquipmentTable({
           cell: (r) =>
             r.requirements?.length ? r.requirements.join(", ") : "—",
           cellClassName: "max-w-[200px]",
-        },
-        {
-          id: "site",
-          label: "Site",
-          accessor: (r) => {
-            const site = sites.find((s) => s.id === r.equipment_site_id);
-            return site?.name ?? null;
-          },
-          sortable: true,
-          filterable: true,
         },
       ]}
       data={equipment}

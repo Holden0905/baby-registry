@@ -9,6 +9,7 @@ export async function updateEquipmentAction(input: {
   equipment_id: string;
   asset_tag: string;
   description: string;
+  regulation_name?: string | null;
   sap_equipment_number?: string | null;
   sort_field?: string | null;
   functional_loc?: string | null;
@@ -23,6 +24,7 @@ export async function updateEquipmentAction(input: {
     await updateEquipment(input.equipment_id, {
       asset_tag: input.asset_tag,
       description: input.description,
+      regulation_name: input.regulation_name ?? undefined,
       sap_equipment_number: input.sap_equipment_number,
       sort_field: input.sort_field,
       functional_loc: input.functional_loc,

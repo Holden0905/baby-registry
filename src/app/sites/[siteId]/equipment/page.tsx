@@ -79,7 +79,10 @@ export default async function EquipmentListPage({ params }: PageProps) {
                 Process Unit
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">
-                Requirements
+                Regulation
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">
+                Citations
               </th>
               <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-600">
                 Open Tasks
@@ -98,6 +101,7 @@ export default async function EquipmentListPage({ params }: PageProps) {
                 <td className="px-4 py-3 text-slate-600">{eq.equipment_description}</td>
                 <td className="whitespace-nowrap px-4 py-3 text-slate-600">{eq.equipment_type ?? "—"}</td>
                 <td className="whitespace-nowrap px-4 py-3 text-slate-600">{eq.process_unit ?? "—"}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-slate-600">{eq.regulation_name ?? "—"}</td>
                 <td className="max-w-[200px] px-4 py-3 text-slate-600">
                   {eq.requirements?.length ? eq.requirements.join(", ") : "—"}
                 </td>

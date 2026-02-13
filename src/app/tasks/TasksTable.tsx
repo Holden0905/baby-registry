@@ -9,6 +9,7 @@ export type TaskRow = {
   asset_tag: string | null;
   task_name: string | null;
   citation: string | null;
+  requirement_summary: string | null;
   due_date: string | null;
   assigned_to_user_id: string | null;
   task_status: string | null;
@@ -47,8 +48,16 @@ export function TasksTable({
         },
         {
           id: "citation",
-          label: "Requirement",
+          label: "Citation",
           accessor: (r) => r.citation,
+          sortable: true,
+          filterable: true,
+          cellClassName: "whitespace-nowrap",
+        },
+        {
+          id: "requirement_summary",
+          label: "Requirement",
+          accessor: (r) => r.requirement_summary,
           sortable: true,
           filterable: true,
         },

@@ -4,6 +4,7 @@ import { getSiteById } from "@/lib/data/sites";
 import { getEquipmentById } from "@/lib/data/equipment";
 import { getEquipmentDetail } from "@/lib/data/equipment";
 import { getTaskTemplatesForSite } from "@/lib/data/task-templates";
+import { getUniqueRegulationNames } from "@/lib/data/requirements";
 import { AddTaskForm } from "./AddTaskForm";
 import { EditEquipmentForm } from "./EditEquipmentForm";
 
@@ -17,14 +18,16 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
   let equipment: Awaited<ReturnType<typeof getEquipmentById>> = null;
   let viewRows: Awaited<ReturnType<typeof getEquipmentDetail>> = [];
   let taskTemplates: Awaited<ReturnType<typeof getTaskTemplatesForSite>> = [];
+  let regulations: string[] = [];
   let loadError: string | null = null;
 
   try {
-    [site, equipment, viewRows, taskTemplates] = await Promise.all([
+    [site, equipment, viewRows, taskTemplates, regulations] = await Promise.all([
       getSiteById(siteId),
       getEquipmentById(equipmentId),
       getEquipmentDetail(equipmentId),
       getTaskTemplatesForSite(siteId),
+      getUniqueRegulationNames(),
     ]);
   } catch (err) {
     const e = err as { message?: string };
@@ -103,7 +106,7 @@ export default async function EquipmentDetailPage({ params }: PageProps) {
         <p className="mt-1 text-slate-600">{equipment.description}</p>
       </div>
 
-      <EditEquipmentForm equipment={equipment} />
+      <EditEquipmentForm equipment={equipment} regulations={regulations} />
 
       <div className="space-y-8">
         <section>

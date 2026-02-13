@@ -6,9 +6,9 @@ import { useState } from "react";
 import { createEquipmentAction } from "./actions";
 import type { TaskTemplateOption } from "@/lib/data/task-templates";
 
-type Props = { siteId: string; taskTemplates: TaskTemplateOption[] };
+type Props = { siteId: string; taskTemplates: TaskTemplateOption[]; regulations: string[] };
 
-export function AddEquipmentForm({ siteId, taskTemplates }: Props) {
+export function AddEquipmentForm({ siteId, taskTemplates, regulations }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,12 +24,19 @@ export function AddEquipmentForm({ siteId, taskTemplates }: Props) {
 
     const asset_tag = get("asset_tag");
     const description = get("description");
+    const regulation_name = get("regulation_name");
     const taskValue = (formData.get("task_template_id") as string) || "";
     const due_date = (formData.get("due_date") as string) || undefined;
     const [task_template_id, requirement_id] = taskValue ? taskValue.split("|") : [];
 
     if (!asset_tag) {
       setError("Asset tag is required");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!regulation_name) {
+      setError("Regulation is required");
       setIsSubmitting(false);
       return;
     }
@@ -45,6 +52,7 @@ export function AddEquipmentForm({ siteId, taskTemplates }: Props) {
         asset_tag,
         description: description || "",
         equipment_site_id: siteId,
+        regulation_name,
         sap_equipment_number: get("sap_equipment_number"),
         sort_field: get("sort_field"),
         functional_loc: get("functional_loc"),
@@ -84,6 +92,30 @@ export function AddEquipmentForm({ siteId, taskTemplates }: Props) {
 
       <div className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="regulation_name" className="block text-sm font-medium text-slate-700">
+              Regulation *
+            </label>
+            <select
+              id="regulation_name"
+              name="regulation_name"
+              required
+              className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              disabled={isSubmitting}
+            >
+              <option value="">Select regulation...</option>
+              {regulations.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+            {regulations.length === 0 && (
+              <p className="mt-1 text-xs text-amber-600">
+                No regulations found. Add requirements with regulation names first.
+              </p>
+            )}
+          </div>
           <div>
             <label htmlFor="asset_tag" className="block text-sm font-medium text-slate-700">
               Asset Tag *

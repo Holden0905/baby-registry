@@ -19,6 +19,7 @@ export async function getEquipmentForSite(siteId: string) {
       equipment_description: string;
       equipment_type: string | null;
       process_unit: string | null;
+      regulation_name: string | null;
       requirements: string[];
       open_task_count: number;
     }
@@ -42,6 +43,7 @@ export async function getEquipmentForSite(siteId: string) {
         equipment_description: r.equipment_description ?? "",
         equipment_type: null,
         process_unit: null,
+        regulation_name: null,
         requirements: citation ? [citation] : [],
         open_task_count: isOpen ? 1 : 0,
       });
@@ -61,19 +63,20 @@ export async function getEquipmentForSite(siteId: string) {
     if (extra) {
       eq.equipment_type = extra.equipment_type;
       eq.process_unit = extra.process_unit;
+      eq.regulation_name = extra.regulation_name;
       if (extra.requirements?.length) eq.requirements = extra.requirements;
     }
   }
   return result;
 }
 
-/** Fetch equipment_type, process_unit, and requirements for given equipment ids */
+/** Fetch equipment_type, process_unit, regulation_name, and requirements for given equipment ids */
 async function fetchEquipmentTypesAndProcessUnits(equipmentIds: string[]) {
   if (equipmentIds.length === 0) return new Map();
   const supabase = createServerSupabase();
   const { data: equipData } = await supabase
     .from("equipment")
-    .select("id, equipment_type, process_unit")
+    .select("id, equipment_type, process_unit, regulation_name")
     .in("id", equipmentIds);
   const { data: erData } = await supabase
     .from("equipment_requirements")
@@ -81,12 +84,14 @@ async function fetchEquipmentTypesAndProcessUnits(equipmentIds: string[]) {
     .in("equipment_id", equipmentIds);
   const map = new Map<
     string,
-    { equipment_type: string | null; process_unit: string | null; requirements: string[] }
+    { equipment_type: string | null; process_unit: string | null; regulation_name: string | null; requirements: string[] }
   >();
   for (const e of equipData ?? []) {
-    map.set(e.id, {
-      equipment_type: e.equipment_type ?? null,
-      process_unit: e.process_unit ?? null,
+    const row = e as { id: string; equipment_type?: string | null; process_unit?: string | null; regulation_name?: string | null };
+    map.set(row.id, {
+      equipment_type: row.equipment_type ?? null,
+      process_unit: row.process_unit ?? null,
+      regulation_name: row.regulation_name ?? null,
       requirements: [],
     });
   }
@@ -127,7 +132,7 @@ async function getEquipmentForSiteFromTable(siteId: string) {
   const supabase = createServerSupabase();
   const { data, error } = await supabase
     .from("equipment")
-    .select("id, asset_tag, description, equipment_type, process_unit")
+    .select("id, asset_tag, description, equipment_type, process_unit, regulation_name")
     .eq("equipment_site_id", siteId)
     .eq("is_active", true)
     .order("asset_tag");
@@ -135,13 +140,15 @@ async function getEquipmentForSiteFromTable(siteId: string) {
   const ids = (data ?? []).map((e) => e.id);
   const extraMap = await fetchEquipmentTypesAndProcessUnits(ids);
   return (data ?? []).map((e) => {
-    const extra = extraMap.get(e.id);
+    const row = e as { id: string; asset_tag: string | null; description: string | null; equipment_type?: string | null; process_unit?: string | null; regulation_name?: string | null };
+    const extra = extraMap.get(row.id);
     return {
-      equipment_id: e.id,
-      asset_tag: e.asset_tag ?? "",
-      equipment_description: e.description ?? "",
-      equipment_type: e.equipment_type ?? extra?.equipment_type ?? null,
-      process_unit: e.process_unit ?? extra?.process_unit ?? null,
+      equipment_id: row.id,
+      asset_tag: row.asset_tag ?? "",
+      equipment_description: row.description ?? "",
+      equipment_type: row.equipment_type ?? extra?.equipment_type ?? null,
+      process_unit: row.process_unit ?? extra?.process_unit ?? null,
+      regulation_name: row.regulation_name ?? extra?.regulation_name ?? null,
       requirements: extra?.requirements ?? [],
       open_task_count: 0,
     };
@@ -153,7 +160,7 @@ export async function getAllEquipment(siteId?: string) {
   const supabase = createServerSupabase();
   let query = supabase
     .from("equipment")
-    .select("id, asset_tag, description, equipment_site_id, equipment_type, process_unit")
+    .select("id, asset_tag, description, equipment_site_id, equipment_type, process_unit, regulation_name")
     .eq("is_active", true)
     .order("asset_tag");
 
@@ -174,6 +181,7 @@ export async function getAllEquipment(siteId?: string) {
     equipment_site_id: string;
     equipment_type?: string | null;
     process_unit?: string | null;
+    regulation_name?: string | null;
   }) => {
     return {
       equipment_id: e.id,
@@ -182,6 +190,7 @@ export async function getAllEquipment(siteId?: string) {
       equipment_site_id: e.equipment_site_id,
       equipment_type: e.equipment_type ?? null,
       process_unit: e.process_unit ?? null,
+      regulation_name: e.regulation_name ?? null,
       requirements: requirementsMap.get(e.id) ?? [],
     };
   });
@@ -214,6 +223,7 @@ export type CreateEquipmentInput = {
   asset_tag: string;
   description: string;
   equipment_site_id: string;
+  regulation_name: string;
   sap_equipment_number?: string | null;
   sort_field?: string | null;
   functional_loc?: string | null;
@@ -231,6 +241,7 @@ export async function createEquipment(input: CreateEquipmentInput) {
     asset_tag: input.asset_tag,
     description: input.description ?? "",
     equipment_site_id: input.equipment_site_id,
+    regulation_name: input.regulation_name?.trim() || null,
     is_active: input.is_active ?? true,
   };
   const optionalFields = [
@@ -257,6 +268,7 @@ export async function createEquipment(input: CreateEquipmentInput) {
 const EQUIPMENT_UPDATE_FIELDS = [
   "asset_tag",
   "description",
+  "regulation_name",
   "sap_equipment_number",
   "sort_field",
   "functional_loc",

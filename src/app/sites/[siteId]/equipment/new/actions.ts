@@ -9,6 +9,7 @@ export async function createEquipmentAction(input: {
   asset_tag: string;
   description: string;
   equipment_site_id: string;
+  regulation_name: string;
   sap_equipment_number?: string | null;
   sort_field?: string | null;
   functional_loc?: string | null;
@@ -26,6 +27,7 @@ export async function createEquipmentAction(input: {
       asset_tag: input.asset_tag,
       description: input.description,
       equipment_site_id: input.equipment_site_id,
+      regulation_name: input.regulation_name,
       sap_equipment_number: input.sap_equipment_number,
       sort_field: input.sort_field,
       functional_loc: input.functional_loc,

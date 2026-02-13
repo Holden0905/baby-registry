@@ -9,6 +9,7 @@ type EquipmentData = {
   asset_tag: string;
   description: string;
   equipment_site_id: string;
+  regulation_name?: string | null;
   sap_equipment_number?: string | null;
   sort_field?: string | null;
   functional_loc?: string | null;
@@ -20,9 +21,9 @@ type EquipmentData = {
   is_active?: boolean;
 };
 
-type Props = { equipment: EquipmentData };
+type Props = { equipment: EquipmentData; regulations: string[] };
 
-export function EditEquipmentForm({ equipment }: Props) {
+export function EditEquipmentForm({ equipment, regulations }: Props) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,8 +40,14 @@ export function EditEquipmentForm({ equipment }: Props) {
 
     const asset_tag = get("asset_tag");
     const description = get("description");
+    const regulation_name = get("regulation_name");
     if (!asset_tag) {
       setError("Asset tag is required");
+      setIsSubmitting(false);
+      return;
+    }
+    if (!regulation_name) {
+      setError("Regulation is required");
       setIsSubmitting(false);
       return;
     }
@@ -50,6 +57,7 @@ export function EditEquipmentForm({ equipment }: Props) {
         equipment_id: equipment.id,
         asset_tag,
         description: description || "",
+        regulation_name: regulation_name || null,
         sap_equipment_number: get("sap_equipment_number") || null,
         sort_field: get("sort_field") || null,
         functional_loc: get("functional_loc") || null,
@@ -108,6 +116,31 @@ export function EditEquipmentForm({ equipment }: Props) {
 
       <div className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="edit-regulation_name" className="block text-sm font-medium text-slate-700">
+              Regulation *
+            </label>
+            <select
+              id="edit-regulation_name"
+              name="regulation_name"
+              required
+              defaultValue={equipment.regulation_name ?? ""}
+              className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              disabled={isSubmitting}
+            >
+              <option value="">Select regulation...</option>
+              {regulations.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+            {regulations.length === 0 && (
+              <p className="mt-1 text-xs text-amber-600">
+                No regulations found. Add requirements with regulation names first.
+              </p>
+            )}
+          </div>
           <div>
             <label htmlFor="edit-asset_tag" className="block text-sm font-medium text-slate-700">
               Asset Tag *

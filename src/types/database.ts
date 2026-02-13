@@ -16,6 +16,7 @@ export interface Equipment {
   asset_tag: string;
   description: string;
   equipment_site_id: string;
+  regulation_name?: string | null;
   created_at?: string;
   [key: string]: unknown;
 }
@@ -23,9 +24,11 @@ export interface Equipment {
 export interface Requirement {
   id: string;
   citation: string;
+  regulation_name?: string;
   requirement_summary: string;
   requirement_text: string;
   site_id: string;
+  is_active?: boolean;
   [key: string]: unknown;
 }
 
