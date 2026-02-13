@@ -91,9 +91,10 @@ async function fetchEquipmentTypesAndProcessUnits(equipmentIds: string[]) {
     });
   }
   for (const er of erData ?? []) {
-    const row = er as { equipment_id: string; requirements: { citation: string } | null };
+    const row = er as { equipment_id: string; requirements: { citation: string } | { citation: string }[] | null };
     const entry = map.get(row.equipment_id);
-    const citation = row.requirements?.citation;
+    const req = row.requirements;
+    const citation = Array.isArray(req) ? req[0]?.citation : req?.citation;
     if (entry && citation && !entry.requirements.includes(citation)) {
       entry.requirements.push(citation);
     }
@@ -111,9 +112,10 @@ async function getRequirementsForEquipment(equipmentIds: string[]) {
     .in("equipment_id", equipmentIds);
   const map = new Map<string, string[]>();
   for (const er of data ?? []) {
-    const row = er as { equipment_id: string; requirements: { citation: string } | null };
+    const row = er as { equipment_id: string; requirements: { citation: string } | { citation: string }[] | null };
     const citations = map.get(row.equipment_id) ?? [];
-    const citation = row.requirements?.citation;
+    const req = row.requirements;
+    const citation = Array.isArray(req) ? req[0]?.citation : req?.citation;
     if (citation && !citations.includes(citation)) citations.push(citation);
     map.set(row.equipment_id, citations);
   }

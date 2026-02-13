@@ -4,7 +4,7 @@ import Link from "next/link";
 import { SortableDataTable } from "@/components/SortableDataTable";
 import { AssignTaskSelect } from "./AssignTaskSelect";
 
-type TaskRow = {
+export type TaskRow = {
   task_id: string;
   asset_tag: string | null;
   task_name: string | null;

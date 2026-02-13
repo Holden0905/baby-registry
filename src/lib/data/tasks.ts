@@ -19,7 +19,7 @@ export async function getTasksFromView(filters?: {
 export async function updateTaskStatus(
   taskId: string,
   status: string,
-  extra?: { rejection_reason?: string; assigned_to_user_id?: string }
+  extra?: { rejection_reason?: string; assigned_to_user_id?: string | null }
 ) {
   const supabase = createServerSupabase();
   const payload: Record<string, unknown> = { status };

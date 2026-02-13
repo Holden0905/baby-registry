@@ -4,7 +4,7 @@ import { getTasksFromView } from "@/lib/data/tasks";
 import { getSites } from "@/lib/data/sites";
 import { getUsers } from "@/lib/data/users";
 import { TasksFilters } from "./TasksFilters";
-import { TasksTable } from "./TasksTable";
+import { TasksTable, type TaskRow } from "./TasksTable";
 
 export const dynamic = "force-dynamic";
 
@@ -55,7 +55,9 @@ export default async function TasksPage({ searchParams }: PageProps) {
       uniqueTasks.set(r.task_id, r);
     }
   }
-  const tasks = Array.from(uniqueTasks.values());
+  const tasks = Array.from(uniqueTasks.values()).filter(
+    (t) => t.task_id != null
+  ) as TaskRow[];
 
   if (loadError) {
     return (
